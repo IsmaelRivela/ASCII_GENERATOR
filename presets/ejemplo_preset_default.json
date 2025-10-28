@@ -1,0 +1,20 @@
+{
+  "caracteres": "abcdefghijklmno",
+  "fuente": "Tulipana",
+  "ancho": 100,
+  "contraste": 1.5,
+  "ratio": 0.55,
+  "invertir": false,
+  "solapamiento": 20,
+  "font_size": 8,
+  "line_height": 0.6,
+  "super_denso": false,
+  "usar_capas": false,
+  "num_capas": 4,
+  "modo_aleatorio": false,
+  "umbral_negro": 128,
+  "escala_resolucion": 3,
+  "invertir_colores": false,
+  "color_caracteres": "auto",
+  "fondo_transparente": false
+}
