@@ -446,7 +446,7 @@ def procesar_imagen(imagen, caracteres, ancho, contraste, ratio, invertir,
         return None, f"Error: {str(e)}", None, None
 
 def crear_interfaz():
-    # Tema personalizado blanco y negro minimalista
+    # Tema personalizado blanco y negro minimalista (Light mode por defecto)
     custom_theme = gr.themes.Base(
         primary_hue=gr.themes.colors.slate,
         secondary_hue=gr.themes.colors.gray,
@@ -470,45 +470,160 @@ def crear_interfaz():
         slider_color='#000000',
     )
     
-    # CSS personalizado para hacer sticky el preview
+    # CSS personalizado para sticky preview y dark mode
     custom_css = """
-    .preview-container {
+    /* Sticky Preview */
+    [data-testid="column"]:has(.preview-sticky) {
         position: sticky !important;
         top: 20px !important;
-        max-height: calc(100vh - 40px) !important;
-        overflow-y: auto !important;
+        align-self: flex-start !important;
     }
     
+    /* Light Mode (default) */
+    .light-mode {
+        --bg-primary: #FFFFFF;
+        --bg-secondary: #FAFAFA;
+        --text-primary: #1a1a1a;
+        --text-secondary: #4a4a4a;
+        --border-color: #E0E0E0;
+        --button-bg: #000000;
+        --button-hover: #2a2a2a;
+        --button-secondary-bg: #F5F5F5;
+        --button-secondary-hover: #E5E5E5;
+    }
+    
+    /* Dark Mode */
+    .dark-mode {
+        --bg-primary: #000000;
+        --bg-secondary: #1a1a1a;
+        --text-primary: #FFFFFF;
+        --text-secondary: #B0B0B0;
+        --border-color: #333333;
+        --button-bg: #FFFFFF;
+        --button-hover: #E5E5E5;
+        --button-secondary-bg: #2a2a2a;
+        --button-secondary-hover: #3a3a3a;
+    }
+    
+    /* Apply theme colors */
+    .gradio-container {
+        background-color: var(--bg-primary) !important;
+    }
+    
+    .dark-mode .gradio-container,
+    .dark-mode .block,
+    .dark-mode [data-testid="block"],
+    .dark-mode .gr-form,
+    .dark-mode .gr-box {
+        background-color: var(--bg-secondary) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-color) !important;
+    }
+    
+    .dark-mode .gr-input,
+    .dark-mode .gr-textbox,
+    .dark-mode input,
+    .dark-mode textarea {
+        background-color: var(--bg-secondary) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-color) !important;
+    }
+    
+    .dark-mode label,
+    .dark-mode .gr-form label,
+    .dark-mode p,
+    .dark-mode h1, .dark-mode h2, .dark-mode h3 {
+        color: var(--text-primary) !important;
+    }
+    
+    .dark-mode .main-title {
+        color: var(--text-primary) !important;
+    }
+    
+    .dark-mode .subtitle,
+    .dark-mode .section-header {
+        color: var(--text-secondary) !important;
+        border-color: var(--border-color) !important;
+    }
+    
+    .dark-mode button[variant="primary"] {
+        background-color: var(--button-bg) !important;
+        color: var(--bg-primary) !important;
+    }
+    
+    .dark-mode button[variant="primary"]:hover {
+        background-color: var(--button-hover) !important;
+    }
+    
+    .dark-mode button:not([variant="primary"]) {
+        background-color: var(--button-secondary-bg) !important;
+        color: var(--text-primary) !important;
+    }
+    
+    .dark-mode button:not([variant="primary"]):hover {
+        background-color: var(--button-secondary-hover) !important;
+    }
+    
+    /* Typography */
     .main-title {
         font-weight: 700 !important;
-        color: #000000 !important;
+        color: var(--text-primary, #000000) !important;
         font-size: 2em !important;
         margin-bottom: 0.5em !important;
         letter-spacing: -0.02em !important;
     }
     
     .subtitle {
-        color: #4a4a4a !important;
+        color: var(--text-secondary, #4a4a4a) !important;
         font-size: 1.1em !important;
         margin-bottom: 2em !important;
     }
     
     .section-header {
         font-weight: 600 !important;
-        color: #000000 !important;
-        border-bottom: 2px solid #000000 !important;
+        color: var(--text-primary, #000000) !important;
+        border-bottom: 2px solid var(--border-color, #E0E0E0) !important;
         padding-bottom: 0.5em !important;
         margin-top: 1.5em !important;
         margin-bottom: 1em !important;
     }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+        position: fixed !important;
+        top: 20px !important;
+        right: 20px !important;
+        z-index: 1000 !important;
+        padding: 10px 20px !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+    }
     """
     
-    with gr.Blocks(title="ASCII Art Converter PRO", theme=custom_theme, css=custom_css) as demo:
-        gr.Markdown("# ASCII Art Converter PRO", elem_classes="main-title")
-        gr.Markdown("Genera arte ASCII en **alta resolución** (PNG) o **formato vectorial** (SVG) para cualquier tamaño", elem_classes="subtitle")
+    with gr.Blocks(title="ASCII Art Converter PRO", theme=custom_theme, css=custom_css, js="""
+    function() {
+        // Dark mode toggle functionality
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.add('light-mode');
+        }
+    }
+    """) as demo:
+        # Toggle para Dark/Light Mode
+        with gr.Row():
+            with gr.Column(scale=5):
+                gr.Markdown("# ASCII Art Converter PRO", elem_classes="main-title")
+                gr.Markdown("Genera arte ASCII en **alta resolución** (PNG) o **formato vectorial** (SVG) para cualquier tamaño", elem_classes="subtitle")
+            with gr.Column(scale=1, min_width=150):
+                theme_toggle = gr.Button("🌙 Dark Mode", elem_classes="theme-toggle", size="sm")
 
         # Variable para SVG download
         svg_output = gr.State()
+        is_dark_mode = gr.State(False)
 
         with gr.Row():
             with gr.Column(scale=1):
@@ -696,8 +811,8 @@ def crear_interfaz():
                     eliminar_preset_btn = gr.Button("Eliminar Preset", size="sm", variant="stop")
                     actualizar_lista_btn = gr.Button("Actualizar Lista", size="sm")
 
-            with gr.Column(scale=1, elem_classes="preview-container"):
-                gr.Markdown("### 🖼️ Preview / Resultado", elem_classes="section-header")
+            with gr.Column(scale=1):
+                gr.Markdown("### Preview / Resultado", elem_classes="section-header preview-sticky")
 
                 output_preview = gr.Image(
                     label="Resultado PNG",
@@ -960,6 +1075,47 @@ def crear_interfaz():
         actualizar_lista_btn.click(
             fn=actualizar_lista_handler,
             outputs=[presets_dropdown]
+        )
+
+        # Handler para theme toggle
+        def toggle_theme(is_dark):
+            new_mode = not is_dark
+            if new_mode:
+                return "☀️ Light Mode", new_mode, """
+                <script>
+                document.body.classList.remove('light-mode');
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'true');
+                </script>
+                """
+            else:
+                return "🌙 Dark Mode", new_mode, """
+                <script>
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('light-mode');
+                localStorage.setItem('darkMode', 'false');
+                </script>
+                """
+        
+        theme_toggle.click(
+            fn=toggle_theme,
+            inputs=[is_dark_mode],
+            outputs=[theme_toggle, is_dark_mode, gr.HTML(visible=False)],
+            js="""
+            (is_dark) => {
+                const newMode = !is_dark;
+                if (newMode) {
+                    document.body.classList.remove('light-mode');
+                    document.body.classList.add('dark-mode');
+                    localStorage.setItem('darkMode', 'true');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    document.body.classList.add('light-mode');
+                    localStorage.setItem('darkMode', 'false');
+                }
+                return is_dark;
+            }
+            """
         )
 
         gr.Markdown("""
