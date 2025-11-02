@@ -446,9 +446,66 @@ def procesar_imagen(imagen, caracteres, ancho, contraste, ratio, invertir,
         return None, f"Error: {str(e)}", None, None
 
 def crear_interfaz():
-    with gr.Blocks(title="ASCII Art Converter PRO", theme=gr.themes.Soft()) as demo:
-        gr.Markdown("# 🎨 Convertidor de Imágenes a ASCII Art PRO")
-        gr.Markdown("Genera arte ASCII en **alta resolución** (PNG) o **formato vectorial** (SVG) para cualquier tamaño")
+    # Tema personalizado blanco y negro minimalista
+    custom_theme = gr.themes.Base(
+        primary_hue=gr.themes.colors.slate,
+        secondary_hue=gr.themes.colors.gray,
+        neutral_hue=gr.themes.colors.slate,
+        font=gr.themes.GoogleFont("Inter"),
+    ).set(
+        body_background_fill='#FFFFFF',
+        body_text_color='#1a1a1a',
+        button_primary_background_fill='#000000',
+        button_primary_background_fill_hover='#2a2a2a',
+        button_primary_text_color='#FFFFFF',
+        button_secondary_background_fill='#F5F5F5',
+        button_secondary_background_fill_hover='#E5E5E5',
+        button_secondary_text_color='#1a1a1a',
+        block_background_fill='#FAFAFA',
+        block_border_color='#E0E0E0',
+        block_label_text_color='#1a1a1a',
+        block_title_text_color='#000000',
+        input_background_fill='#FFFFFF',
+        input_border_color='#D0D0D0',
+        slider_color='#000000',
+    )
+    
+    # CSS personalizado para hacer sticky el preview
+    custom_css = """
+    .preview-container {
+        position: sticky !important;
+        top: 20px !important;
+        max-height: calc(100vh - 40px) !important;
+        overflow-y: auto !important;
+    }
+    
+    .main-title {
+        font-weight: 700 !important;
+        color: #000000 !important;
+        font-size: 2em !important;
+        margin-bottom: 0.5em !important;
+        letter-spacing: -0.02em !important;
+    }
+    
+    .subtitle {
+        color: #4a4a4a !important;
+        font-size: 1.1em !important;
+        margin-bottom: 2em !important;
+    }
+    
+    .section-header {
+        font-weight: 600 !important;
+        color: #000000 !important;
+        border-bottom: 2px solid #000000 !important;
+        padding-bottom: 0.5em !important;
+        margin-top: 1.5em !important;
+        margin-bottom: 1em !important;
+    }
+    """
+    
+    with gr.Blocks(title="ASCII Art Converter PRO", theme=custom_theme, css=custom_css) as demo:
+        gr.Markdown("# ASCII Art Converter PRO", elem_classes="main-title")
+        gr.Markdown("Genera arte ASCII en **alta resolución** (PNG) o **formato vectorial** (SVG) para cualquier tamaño", elem_classes="subtitle")
 
         # Variable para SVG download
         svg_output = gr.State()
@@ -461,7 +518,7 @@ def crear_interfaz():
                     height=300
                 )
 
-                gr.Markdown("### ⚙️ Configuración")
+                gr.Markdown("### Configuración", elem_classes="section-header")
 
                 caracteres_input = gr.Textbox(
                     label="Caracteres ASCII",
@@ -470,7 +527,7 @@ def crear_interfaz():
                 )
 
                 fuente_selector = gr.Radio(
-                    label="🔤 Seleccionar fuente",
+                    label="Seleccionar fuente",
                     choices=["Tulipana", "Rushmore"],
                     value="Tulipana",
                     info="Cambia entre las fuentes disponibles"
@@ -488,29 +545,29 @@ def crear_interfaz():
 
                 with gr.Row():
                     invertir_colores_check = gr.Checkbox(
-                        label="🔄 Invertir colores",
+                        label="Invertir colores",
                         value=False,
                         info="Blanco sobre negro ↔ Negro sobre blanco"
                     )
                     preview_live_check = gr.Checkbox(
-                        label="👁️ Preview en vivo",
+                        label="Preview en vivo",
                         value=False,
                         info="Actualiza automáticamente (puede ser lento)"
                     )
                 
                 with gr.Row():
                     color_picker = gr.ColorPicker(
-                        label="🎨 Color de caracteres",
+                        label="Color de caracteres",
                         value="#000000",
                         info="Elige el color de los caracteres (o deja auto)"
                     )
                     fondo_transparente_check = gr.Checkbox(
-                        label="🔲 Fondo transparente",
+                        label="Fondo transparente",
                         value=False,
                         info="PNG con fondo transparente (solo PNG)"
                     )
 
-                with gr.Accordion("🎯 Parámetros básicos", open=True):
+                with gr.Accordion("Parámetros básicos", open=True):
                     ancho_slider = gr.Slider(
                         label="Ancho (caracteres)",
                         minimum=30,
@@ -536,7 +593,7 @@ def crear_interfaz():
                     )
 
                     escala_resolucion = gr.Slider(
-                        label="📐 Escala de resolución (PNG)",
+                        label="Escala de resolución (PNG)",
                         minimum=1,
                         maximum=10,
                         value=3,
@@ -544,7 +601,7 @@ def crear_interfaz():
                         info="1x=normal, 5x=print, 10x=gran formato"
                     )
 
-                with gr.Accordion("🎲 Modo aleatorio (logos/siluetas)", open=False):
+                with gr.Accordion("Modo aleatorio (logos/siluetas)", open=False):
                     modo_aleatorio_check = gr.Checkbox(
                         label="Activar modo aleatorio",
                         value=False,
@@ -559,7 +616,7 @@ def crear_interfaz():
                         step=5
                     )
 
-                with gr.Accordion("🎨 Sistema de capas (fotografías)", open=False):
+                with gr.Accordion("Sistema de capas (fotografías)", open=False):
                     usar_capas_check = gr.Checkbox(
                         label="Activar sistema de capas",
                         value=False
@@ -573,7 +630,7 @@ def crear_interfaz():
                         step=1
                     )
 
-                with gr.Accordion("🔧 Parámetros avanzados", open=False):
+                with gr.Accordion("Parámetros avanzados", open=False):
                     solapamiento_slider = gr.Slider(
                         label="Solapamiento (%)",
                         minimum=0,
@@ -609,24 +666,24 @@ def crear_interfaz():
                         value=False
                     )
             
-                procesar_btn = gr.Button("🚀 Generar ASCII Art", variant="primary", size="lg")
+                procesar_btn = gr.Button("Generar ASCII Art", variant="primary", size="lg")
 
-                gr.Markdown("### 📋 Presets de caracteres")
-                gr.Markdown("**🎨 Para ambas fuentes (Tulipana & Rushmore):**")
+                gr.Markdown("### Presets de caracteres", elem_classes="section-header")
+                gr.Markdown("**Para ambas fuentes (Tulipana & Rushmore)**")
                 with gr.Row():
-                    preset_tulipana = gr.Button("🔤 Tulipana", size="sm")
-                    preset_flores = gr.Button("🌸 Flores", size="sm")
-                    preset_bloques = gr.Button("■ Bloques", size="sm")
-                    preset_clasico = gr.Button("@ Clásico", size="sm")
+                    preset_tulipana = gr.Button("Tulipana", size="sm")
+                    preset_flores = gr.Button("Flores", size="sm")
+                    preset_bloques = gr.Button("Bloques", size="sm")
+                    preset_clasico = gr.Button("Clásico", size="sm")
 
-                gr.Markdown("### 💾 Gestión de Presets Personalizados")
+                gr.Markdown("### Gestión de Presets Personalizados", elem_classes="section-header")
                 with gr.Row():
                     nombre_preset_input = gr.Textbox(
                         label="Nombre del preset",
                         placeholder="Ej: mi_configuracion_favorita",
                         scale=2
                     )
-                    guardar_preset_btn = gr.Button("💾 Guardar", size="sm", scale=1)
+                    guardar_preset_btn = gr.Button("Guardar", size="sm", scale=1)
                 
                 presets_dropdown = gr.Dropdown(
                     label="Cargar preset guardado",
@@ -635,12 +692,12 @@ def crear_interfaz():
                 )
                 
                 with gr.Row():
-                    cargar_preset_btn = gr.Button("📂 Cargar Preset", size="sm")
-                    eliminar_preset_btn = gr.Button("🗑️ Eliminar Preset", size="sm", variant="stop")
-                    actualizar_lista_btn = gr.Button("🔄 Actualizar Lista", size="sm")
+                    cargar_preset_btn = gr.Button("Cargar Preset", size="sm")
+                    eliminar_preset_btn = gr.Button("Eliminar Preset", size="sm", variant="stop")
+                    actualizar_lista_btn = gr.Button("Actualizar Lista", size="sm")
 
-            with gr.Column(scale=1):
-                gr.Markdown("### 🖼️ Preview / Resultado")
+            with gr.Column(scale=1, elem_classes="preview-container"):
+                gr.Markdown("### 🖼️ Preview / Resultado", elem_classes="section-header")
 
                 output_preview = gr.Image(
                     label="Resultado PNG",
@@ -649,12 +706,12 @@ def crear_interfaz():
                 )
 
                 svg_download = gr.File(
-                    label="📥 Descargar SVG",
+                    label="Descargar SVG",
                     visible=False
                 )
 
                 params_download = gr.File(
-                    label="📄 Descargar Parámetros (.txt)",
+                    label="Descargar Parámetros (.txt)",
                     visible=True
                 )
 
@@ -906,27 +963,29 @@ def crear_interfaz():
         )
 
         gr.Markdown("""
-        ### 💡 Tips de uso: 
-
-        **� Fuentes disponibles:**
+        ---
+        
+        ### Tips de uso
+        
+        **Fuentes disponibles**
         - **Tulipana:** Fuente original del proyecto
         - **Rushmore:** Nueva fuente con estilo diferente
         - Al cambiar fuente se actualizan automáticamente los caracteres por defecto
-
-        **�🖨️ Para impresión/gran formato:**
-        - Usa **PNG con escala 5-10x**
-        - O mejor: **SVG** (escalable sin pérdida)
-
-        **📱 Para web/redes sociales:**
+        
+        **Para impresión/gran formato**
+        - PNG con escala 5-10x
+        - SVG (escalable sin pérdida)
+        
+        **Para web/redes sociales**
         - PNG escala 2-3x
-
-        **🎨 Modos:**
+        
+        **Modos especiales**
         - **Aleatorio:** Logos, tipografías, siluetas en blanco y negro
         - **Capas:** Fotografías y degradados complejos
-
-        **🔄 Invertir colores:** Útil para fondos blancos o impresión
-
-        **👁️ Preview en vivo:** Actualiza automáticamente al cambiar valores (puede ser lento con imágenes grandes)
+        
+        **Otras funciones**
+        - **Invertir colores:** Útil para fondos blancos o impresión
+        - **Preview en vivo:** Actualiza automáticamente al cambiar valores (puede ser lento con imágenes grandes)
         """)
 
         return demo
